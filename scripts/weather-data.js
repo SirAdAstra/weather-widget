@@ -95,8 +95,8 @@ export const weatherMap = {
     description: { ru: "Сильный снегопад", en: "Heavy snow fall" }
   },
   77: {
-    icon: "wi-day-snow-grains",
-    nightIcon: "wi-night-alt-snow-grains",
+    icon: "wi-day-snow",
+    nightIcon: "wi-night-alt-snow",
     description: { ru: "Снежные зерна", en: "Snow grains" }
   },
   80: {

@@ -12,6 +12,8 @@ const API_CONFIG = {
   baseUrl: 'https://api.open-meteo.com/v1/forecast',
   locationUrl: 'https://api.bigdatacloud.net/data/reverse-geocode-client',
   units: 'metric',
+  windSpeedUnit: 'ms',
+  temperatureUnit: 'celsius',
   lang: 'ru',
   defaultLocation: { lat: 47.2678, lon: 29.1494 }, // Dubossary, Moldova
   metrics: {
@@ -101,7 +103,8 @@ async function getGeolocation() {
           state.isGeolocationBlocked = true;
         }
         resolve(API_CONFIG.defaultLocation);
-      }
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
     );
   });
 }
@@ -112,9 +115,11 @@ async function fetchWeather(lat, lon) {
     `&current=${API_CONFIG.metrics.current}` +
     `&daily=${API_CONFIG.metrics.daily}` +
     `&timezone=${API_CONFIG.timezone}` +
+    `&wind_speed_unit=${API_CONFIG.windSpeedUnit}` +
+    `&temperature_unit=${API_CONFIG.temperatureUnit}` +
     `&forecast_days=${API_CONFIG.forecast_days}`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
   if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
   return await response.json();
 }
@@ -124,7 +129,7 @@ async function fetchLocationName(lat, lon) {
     `${API_CONFIG.locationUrl}?latitude=${lat}&longitude=${lon}` +
     `&localityLanguage=${API_CONFIG.lang}`;
   
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!response.ok) return {city: 'Неизвестный город', countryName: '' };
     return await response.json();
 }
@@ -137,7 +142,6 @@ function transformWeatherData(apiData) {
   return {
     temperature: Math.round(apiData.current.temperature_2m),
     weatherCode: apiData.current.weather_code,
-    date: new Date(apiData.current.time),
     isDay: apiData.current.is_day,
     maxTemp: Math.round(apiData.daily.temperature_2m_max[0]),
     minTemp: Math.round(apiData.daily.temperature_2m_min[0]),
@@ -242,7 +246,6 @@ function getUVDetails(uvIndex) {
 
 function renderWeather(weather, location) {
   if (elements.city) elements.city.textContent = `${location.city}, ${location.country}`;
-  if (elements.date) elements.date.textContent = formatDateTime(weather.date);
   if (elements.temp) elements.temp.textContent = weather.temperature;
 
   if (elements.weatherIcon && elements.description) {
@@ -315,6 +318,20 @@ function renderForecast(forecastItems) {
   });
 
   elements.forecastContainer.innerHTML = html;
+}
+
+function startClock() {
+  
+  
+  setInterval((function update() {
+    if (elements.date) {
+      const now = new Date();
+      console.log(now);
+      elements.date.textContent = formatDateTime(now);
+      elements.date.setAttribute('datetime', now.toISOString());
+    }
+    return update;
+  })(), 60000);
 }
 
 // =================
@@ -392,10 +409,22 @@ async function loadData() {
 
     state.location = await getGeolocation();
 
-    const [rawWeatherData, rawLocationData] = await Promise.all([
+    const results = await Promise.allSettled([
       fetchWeather(state.location.lat, state.location.lon),
       fetchLocationName(state.location.lat, state.location.lon)
     ]);
+
+    const weatherResult = results[0];
+    const locationResult = results[1];
+
+    if (weatherResult.status === 'rejected') {
+      throw weatherResult.reason;
+    }
+
+    const rawWeatherData = weatherResult.value;
+    const rawLocationData = locationResult.status === 'fulfilled'
+      ? locationResult.value
+      : { city: 'Неизвестный город', countryName: '' };
 
     const cleanWeather = transformWeatherData(rawWeatherData);
     const cleanLocation = transformLocationData(rawLocationData);
@@ -421,6 +450,7 @@ async function loadData() {
 async function init() {
   bindEvents();
   await loadData();
+  startClock();
 }
 
 document.addEventListener('DOMContentLoaded', init);
