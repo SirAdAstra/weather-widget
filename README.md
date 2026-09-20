@@ -12,7 +12,7 @@ A polished, framework-free weather widget built with vanilla JavaScript. Shows c
 
 ![preview](./preview.png)
 
-**[▶ Live Demo](#)**
+**[▶ Live Demo](https://siradastra.github.io/weather-widget/)**
 
 ## ✨ Features
 
