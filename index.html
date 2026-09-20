@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Widget</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/weather-icons.css">
+    <link rel="stylesheet" href="css/weather-icons-wind.css">
+    <script type="module" src="scripts/script.js"></script>
+</head>
+
+<body>
+    <div class="weather-widget" id="weather-widget">
+        <div id="error-banner" class="error-banner" role="alert" aria-live="polite" style="display: none;">
+            <div class="error-content">
+                <span class="error-icon" aria-hidden="true">⚠️</span>
+                <span id="error-text">Не удалось загрузить данные о погоде. Проверьте подключение.</span>
+            </div>
+            <button class="error-close" id="error-close" aria-label="Закрыть уведомление">&times;</button>
+        </div>
+
+        <div class="skeleton-panel" id="skeleton-panel">
+            <div class="skeleton-current">
+                <div class="skeleton-header">
+                    <div class="skeleton-line skeleton-title"></div>
+                    <div class="skeleton-line skeleton-subtitle"></div>
+                </div>
+                <div class="skeleton-main">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-content-block">
+                        <div class="skeleton-line skeleton-temp"></div>
+                        <div class="skeleton-line skeleton-desk"></div>
+                        <div class="skeleton-line skeleton-range"></div>
+                    </div>
+                </div>
+                <div class="skeleton-grid">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <aside class="skeleton-forecast">
+                <div class="skeleton-line skeleton-forecast-title"></div>
+                <div class="skeleton-forecast-list">
+                    <div class="skeleton-forecast-item"></div>
+                    <div class="skeleton-forecast-item"></div>
+                    <div class="skeleton-forecast-item"></div>
+                    <div class="skeleton-forecast-item"></div>
+                    <div class="skeleton-forecast-item"></div>
+                    <div class="skeleton-forecast-item"></div>
+                    <div class="skeleton-forecast-item"></div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- LEFT: Current weather -->
+        <section class="weather-current">
+
+            <header class="weather-header">
+                <div class="weather-meta">
+                    <button class="weather-location-btn" aria-label="Выбрать город">
+                        <i class="wi wi-direction-up-right location-icon" aria-hidden="true"></i>
+                        <span id="city" class="weather-city">--</span>
+                        <i class="location-arrow" aria-hidden="true"></i>
+                    </button>
+
+                    <time class="weather-date" id="date" datetime="2026-08-28T14:30">
+                        --
+                    </time>
+                </div>
+
+                <div class="weather-actions">
+                    <button class="icon-button" id="refresh" aria-label="Обновить погоду">
+                        <i class="wi wi-refresh" aria-hidden="true"></i>
+                    </button>
+
+                    <button class="icon-button" id="menu-trigger" aria-label="Открыть меню" aria-haspopup="true">
+                        <span class="dots-icon" aria-hidden="true">⋮</span>
+                    </button>
+                </div>
+            </header>
+
+
+            <!-- Main temperature -->
+            <section class="weather-main" aria-label="Текущая температура и состояние погоды">
+
+                <i class="wi weather-icon-large" id="weatherIcon" aria-hidden="true"></i>
+
+                <div class="temperature-container">
+                    <div class="temperature">
+                        <span id="temperature">--</span>
+                        <span class="temperature-unit" id="tempUnit">°C</span>
+                    </div>
+
+                    <div class="weather-description" id="description">
+                        --
+                    </div>
+
+                    <div class="temperature-range" aria-label="Диапазон температур на сегодня">
+                        <span class="temperature-high">
+                            <span aria-hidden="true">↑</span> <span id="maxTemp">--</span>°
+                        </span>
+
+                        <span class="temperature-low">
+                            <span aria-hidden="true">↓</span> <span id="minTemp">--</span>°
+                        </span>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- Weather details -->
+            <section class="weather-details" aria-label="Дополнительные параметры погоды">
+                
+                <div class="detail-card">
+                    <i class="wi wi-strong-wind detail-icon" aria-hidden="true"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Ветер</div>
+                        <div class="detail-value">
+                            <span id="wind">--</span>
+                            <div class="wind-direction-wrap">
+                                <i class="wi wi-wind wi-from-e" id="wind-arrow" aria-hidden="true"></i>
+                                <span id="wind-dir" class="sub-label">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <i class="wi wi-humidity detail-icon" aria-hidden="true"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Влажность</div>
+                        <div class="detail-value">
+                            <span id="humidity">--</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="detail-card">
+                    <i class="wi wi-barometer detail-icon" aria-hidden="true"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Давление</div>
+                        <div class="detail-value">
+                            <span id="pressure">--</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="detail-card">
+                    <i class="wi wi-horizon-alt detail-icon" aria-hidden="true"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Восход / Закат</div>
+                        <div class="detail-value">
+                            <span id="sunrise">--</span> / <span id="sunset">--</span>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- UV -->
+            <section class="uv-card" aria-label="Ультрафиолетовый индекс">
+
+                <div class="uv-info">
+                    <i class="wi wi-day-sunny uv-icon" aria-hidden="true"></i>
+
+                    <div class="uv-meta">
+                        <div class="detail-label">УФ-индекс</div>
+                        <div class="uv-value">
+                            <span id="uv">--</span>
+                            <span id="uv-text">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uv-scale">
+                    <div class="uv-bar">
+                        <div class="uv-marker" id="uv-marker"></div>
+                    </div>
+
+                    <div class="uv-numbers" aria-hidden="true">
+                        <span>0</span>
+                        <span>2</span>
+                        <span>4</span>
+                        <span>6</span>
+                        <span>8</span>
+                        <span>10</span>
+                        <span>12+</span>
+                    </div>
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- RIGHT: Forecast -->
+        <aside class="weather-forecast">
+            <h2 class="forecast-title">Прогноз на 7 дней</h2>
+
+            <div class="forecast-list" id="forecast-list"></div>
+        </aside>
+
+    </div>
+</body>
+
+</html>
